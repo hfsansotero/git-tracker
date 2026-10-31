@@ -22,7 +22,7 @@ jobs:
           animal: fox # a built-in animal (fox) or an animal folder in this repository
       - name: Commit the GIF if it changed
         run: |
-          git add tracker/tracker.gif
+          git add tracker
           git diff --cached --quiet && exit 0
           git -c user.name="github-actions[bot]" \
               -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \

@@ -49,6 +49,42 @@ still see their pet grow, and it shrinks back if you stop.
 GitHub pauses scheduled workflows after 60 days without activity in the
 repository. Re-enable it from the Actions tab if that happens.
 
+## Choosing your animal
+
+Only the animal you name in **your** workflow appears on your profile. Every other
+animal, built-in or yours, is ignored. To change it, edit one line in
+`.github/workflows/git-tracker.yml` of your profile repository:
+
+```yaml
+      - uses: hfsansotero/git-tracker@main
+        with:
+          animal: fox             # a built-in animal...
+          # animal: animals/cat   # ...or a folder in your profile repository
+```
+
+To show several animals, add one step per animal, each with its own
+`output-dir`, and one `<img>` per GIF in your README:
+
+```yaml
+      - uses: hfsansotero/git-tracker@main
+        with:
+          animal: fox
+          output-dir: tracker/fox
+      - uses: hfsansotero/git-tracker@main
+        with:
+          animal: animals/cat
+          output-dir: tracker/cat
+```
+
+```html
+<img src="tracker/fox/tracker.gif" width="192" alt="My fox">
+<img src="tracker/cat/tracker.gif" width="192" alt="My cat">
+```
+
+The commit step (`git add tracker`) already picks up every folder under `tracker/`.
+The CI of this repository renders all built-in animals only to test them; that
+never reaches anyone's profile.
+
 ## Animal format
 
 Built-in animals and your own use the same folder format:

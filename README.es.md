@@ -49,6 +49,42 @@ actividad también ve crecer a su mascota, y si lo dejas vuelve a encoger.
 GitHub pausa los workflows programados tras 60 días sin actividad en el
 repositorio. Si pasa, vuelve a activarlo desde la pestaña Actions.
 
+## Elegir tu animal
+
+En tu perfil solo sale el animal que pongas en **tu** workflow. El resto de
+animales, incluidos o tuyos, se ignoran. Para cambiarlo, edita una línea de
+`.github/workflows/git-tracker.yml` en tu repositorio de perfil:
+
+```yaml
+      - uses: hfsansotero/git-tracker@main
+        with:
+          animal: fox             # un animal incluido...
+          # animal: animals/gato  # ...o una carpeta de tu repositorio de perfil
+```
+
+Para mostrar varios animales, añade un paso por animal, cada uno con su propio
+`output-dir`, y un `<img>` por GIF en tu README:
+
+```yaml
+      - uses: hfsansotero/git-tracker@main
+        with:
+          animal: fox
+          output-dir: tracker/fox
+      - uses: hfsansotero/git-tracker@main
+        with:
+          animal: animals/gato
+          output-dir: tracker/gato
+```
+
+```html
+<img src="tracker/fox/tracker.gif" width="192" alt="Mi zorro">
+<img src="tracker/gato/tracker.gif" width="192" alt="Mi gato">
+```
+
+El paso del commit (`git add tracker`) ya recoge todas las carpetas dentro de
+`tracker/`. El CI de este repositorio dibuja todos los animales incluidos solo
+para probarlos; eso nunca llega al perfil de nadie.
+
 ## Formato de un animal
 
 Los animales incluidos y los tuyos usan el mismo formato de carpeta:
