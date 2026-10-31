@@ -1,0 +1,30 @@
+# Copy into your profile repository (github.com/<you>/<you>) as .github/workflows/git-tracker.yml
+name: git-tracker
+
+on:
+  schedule:
+    - cron: "5 0 * * *" # every night, just after midnight UTC
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/git-tracker.yml
+
+permissions:
+  contents: write
+
+jobs:
+  draw:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hfsansotero/git-tracker@main
+        with:
+          animal: fox # a built-in animal (fox) or an animal folder in this repository
+      - name: Commit the GIF if it changed
+        run: |
+          git add tracker/tracker.gif
+          git diff --cached --quiet && exit 0
+          git -c user.name="github-actions[bot]" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -m "Update git-tracker"
+          git push

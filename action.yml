@@ -1,0 +1,46 @@
+name: git-tracker
+description: Draw a pixel-art pet that grows and changes with your GitHub activity, as a GIF for your profile README.
+branding:
+  icon: activity
+  color: green
+
+inputs:
+  animal:
+    description: Animal folder in your repository, or the name of a built-in animal.
+    required: true
+  login:
+    description: Account whose activity to track.
+    default: ${{ github.repository_owner }}
+  output-dir:
+    description: Folder that receives tracker.gif.
+    default: tracker
+  thresholds:
+    description: Contributions in the last year to become young and adult, separated by a space.
+    default: "50 300"
+  token:
+    description: Token for reading public data; the built-in token is enough.
+    default: ${{ github.token }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.13"
+    - name: Install git-tracker
+      shell: bash
+      run: pip install --quiet "$GITHUB_ACTION_PATH"
+    - name: Collect activity and render
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.token }}
+        TRACKER_LOGIN: ${{ inputs.login }}
+        TRACKER_ANIMAL: ${{ inputs.animal }}
+        TRACKER_OUTPUT_DIR: ${{ inputs.output-dir }}
+        TRACKER_THRESHOLDS: ${{ inputs.thresholds }}
+      run: |
+        animal="$TRACKER_ANIMAL"
+        [ -d "$animal" ] || animal="$GITHUB_ACTION_PATH/animals/$TRACKER_ANIMAL"
+        [ -d "$animal" ] || { echo "animal '$TRACKER_ANIMAL' not found in the repository or among the built-in animals" >&2; exit 1; }
+        git-tracker collect "$TRACKER_LOGIN" -o "$RUNNER_TEMP/snapshot.json"
+        git-tracker render "$RUNNER_TEMP/snapshot.json" "$animal" -o "$TRACKER_OUTPUT_DIR" --thresholds $TRACKER_THRESHOLDS

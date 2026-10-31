@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install .
+      - name: Unit tests
+        run: for f in tests/test_*.py; do python "$f"; done
+      - name: End to end against the GitHub API
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          from PIL import Image, ImageDraw
+          im = Image.new("RGBA", (64, 64)); ImageDraw.Draw(im).ellipse((4, 16, 60, 60), fill="#808080"); im.save("blob.png")
+          PY
+          git-tracker pixelize blob.png out/blob
+          echo '{"recolor": [["#808080"]]}' > out/blob/animal.json
+          git-tracker collect "${{ github.repository_owner }}" -o snapshot.json
+          git-tracker render snapshot.json out/blob -o out
+          git-tracker preview out/blob
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gifs
+          path: out/**/*.gif

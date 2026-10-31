@@ -1,0 +1,125 @@
+# git-tracker
+
+**English** | [Español](README.es.md)
+
+A pixel-art pet for your GitHub profile that grows, changes color, and moves with
+your activity. Pick an animal or make your own from an image. Inspired by
+[git-koi](https://github.com/yalongwastaken/git-koi).
+
+## How your activity shows
+
+| What          | Comes from                                          |
+| ------------- | --------------------------------------------------- |
+| **Stage**     | Contributions in the last year: `baby` → `young` → `adult` (default thresholds 50 and 300) |
+| **Animation** | What happened up to yesterday (table below)         |
+| **Colors**    | Main languages of your public repositories          |
+
+| Animation | When (first match wins)                                    |
+| --------- | ---------------------------------------------------------- |
+| `sleep`   | 14 or more days in a row without contributions             |
+| `eat`     | Yesterday was the first day with contributions of its week |
+| `active`  | Last 7 days at least twice your weekly average (and ≥ 5)   |
+| `idle`    | Anything else                                              |
+
+Growth uses the last year, not your whole history, so people with little activity
+still see their pet grow, and it shrinks back if you stop.
+
+## On your profile README
+
+1. Copy [examples/profile-workflow.yml](examples/profile-workflow.yml) into your
+   profile repository (`<you>/<you>`) as `.github/workflows/git-tracker.yml`.
+2. Set `animal:` to a built-in animal (`fox`) or to an animal folder in that
+   repository (format below).
+3. Add the GIF to its `README.md`:
+
+   ```html
+   <img src="tracker/tracker.gif" alt="My git-tracker" />
+   ```
+
+4. Run the workflow once from the Actions tab. After that it runs every night.
+
+| Input        | Default              | Meaning                                           |
+| ------------ | -------------------- | ------------------------------------------------- |
+| `animal`     | (required)           | Animal folder in your repository, or a built-in animal name |
+| `login`      | The repository owner | Account whose activity to track                   |
+| `output-dir` | `tracker`            | Folder that receives `tracker.gif`                |
+| `thresholds` | `50 300`             | Contributions in the last year to become young and adult |
+| `token`      | The built-in token   | Token for reading public data                     |
+
+GitHub pauses scheduled workflows after 60 days without activity in the
+repository. Re-enable it from the Actions tab if that happens.
+
+## Animal format
+
+Built-in animals and your own use the same folder format:
+
+```text
+animals/cat/
+├── animal.json           optional: {"fps": 6, "scale": 2, "recolor": [...]}
+├── baby/                 stage: little activity
+│   ├── idle/             default animation
+│   │   ├── 01.png
+│   │   └── 02.png
+│   ├── active/
+│   ├── eat/
+│   └── sleep/
+├── young/
+│   └── ...
+└── adult/
+    └── ...
+```
+
+- **Frames:** one PNG per frame with a transparent background, sorted by number
+  (`2.png` comes before `10.png`).
+- **Only `adult/idle/01.png` is required.** A missing animation falls back to
+  `idle` of the same stage. A missing stage falls back to the closest one (the
+  smaller one on a tie). An animal can start as a single frame.
+- **Sizes:** each stage can have its own size (that is how it grows). Frames of one
+  animation should all be the same size. Each frame is centered and rests on the
+  bottom edge of a canvas shared by the whole animal, so the GIF size never
+  changes.
+- **Real pixel art:** draw at real size (16, 24, 32 px…) and let `scale` enlarge
+  it without smoothing. Do not export it already enlarged.
+- **`animal.json`:**
+  - `fps`: animation speed, as one number or per animation:
+    `{"idle": 1.5, "active": 4}` (missing ones use 6).
+  - `scale`: whole-number enlargement of the GIF.
+  - `recolor`: groups of exact sprite colors that take a language's color. The
+    first group takes your top language, the second group your second one:
+    `[["#c86420", "#e07020"], ["#2040a0"]]`. Each pixel keeps its brightness,
+    so shading survives.
+
+## Built-in animals
+
+| Name  | Made with |
+| ----- | --------- |
+| `fox` | Poses generated with Higgsfield, processed by [sources/fox/build.py](sources/fox/build.py) |
+
+## Make an animal from an image
+
+Use a PNG with a transparent background, or with a plain background that touches
+the corners (it is removed automatically):
+
+```sh
+git-tracker pixelize photo.png animals/mine --sizes 16 24 32 --colors 16
+```
+
+This creates `baby`, `young` and `adult` at 16, 24 and 32 px, each with a generic
+two-frame `idle`. Touch up or replace any frame by hand afterwards.
+
+## Command line
+
+```sh
+conda create -n git-tracker python=3.13 && conda activate git-tracker
+pip install -e .
+git-tracker preview animals/cat               # one GIF per stage and animation in out/cat/
+export GITHUB_TOKEN=$(gh auth token)          # any token works; public data only
+git-tracker collect <login> -o snapshot.json  # last year of activity and languages
+git-tracker render snapshot.json animals/cat  # today's out/tracker.gif
+```
+
+Tests: `for f in tests/test_*.py; do python "$f"; done`
+
+## License
+
+MIT.

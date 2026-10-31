@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "git-tracker"
+version = "0.1.0"
+description = "A pixel-art pet that grows and changes with your GitHub activity."
+requires-python = ">=3.10"
+dependencies = ["pillow>=12"]
+
+[project.scripts]
+git-tracker = "git_tracker.__main__:main"
+
+[tool.setuptools]
+packages = ["git_tracker"]
