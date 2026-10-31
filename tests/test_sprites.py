@@ -32,6 +32,7 @@ with tempfile.TemporaryDirectory() as tmp:
 
     canvas = sprites.canvas_size(animal)
     assert canvas == (16, 12)
+    assert sprites.palette(animal) == {"#ff0000": 8 * 8 + 16 * 12 + 16 * 10, "#0000ff": 16 * 12}
     out = sprites.compose(frames, canvas, 2)
     assert out[0].size == (32, 24)
     small = sprites.compose([Image.new("RGBA", (8, 8), (255, 0, 0, 255))], canvas, 1)[0]

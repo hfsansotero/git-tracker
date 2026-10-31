@@ -2,6 +2,7 @@
 import colorsys
 import json
 import re
+from collections import Counter
 from pathlib import Path
 
 from PIL import Image, ImageDraw
@@ -53,6 +54,14 @@ def canvas_size(animal_dir: Path) -> tuple[int, int]:
         with Image.open(f) as img:
             sizes.append(img.size)
     return max(w for w, _ in sizes), max(h for _, h in sizes)
+
+
+def palette(animal_dir: Path) -> Counter:
+    """Colores opacos de todos los frames del animal ("#rrggbb" -> píxeles), para elegir `recolor`."""
+    counts = Counter()
+    for f in animal_dir.glob("*/*/*.png"):
+        counts.update("#%02x%02x%02x" % p[:3] for p in _load(f).get_flattened_data() if p[3])
+    return counts
 
 
 def compose(frames: list[Image.Image], canvas: tuple[int, int], scale: int) -> list[Image.Image]:

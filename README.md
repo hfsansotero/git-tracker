@@ -49,6 +49,18 @@ still see their pet grow, and it shrinks back if you stop.
 GitHub pauses scheduled workflows after 60 days without activity in the
 repository. Re-enable it from the Actions tab if that happens.
 
+### Whose activity, whose code
+
+- **Your data:** the Action reads the activity of the account that owns the
+  repository where it runs (`login`), so everyone gets their own stage, animation
+  and colors. Nobody else's activity is ever mixed in.
+- **Our code:** `hfsansotero/git-tracker@main` means each night you use the latest
+  version of this tool and of its built-in animals. To freeze a version, use a
+  commit SHA instead of `main`:
+  `uses: hfsansotero/git-tracker@08c41ede109fc87551e004cc1921880de5d5df4f`.
+- **Your animals:** an animal folder in your own repository is yours alone; changes
+  here never touch it.
+
 ## Choosing your animal
 
 Only the animal you name in **your** workflow appears on your profile. Every other
@@ -131,24 +143,74 @@ animals/cat/
 | ----- | --------- |
 | `fox` | Poses generated with Higgsfield, processed by [sources/fox/build.py](sources/fox/build.py) |
 
-## Make an animal from an image
+## Your own animal, step by step
 
-Use a PNG with a transparent background, or with a plain background that touches
-the corners (it is removed automatically):
+1. **Install the tool** to preview your animal before publishing it:
 
-```sh
-git-tracker pixelize photo.png animals/mine --sizes 16 24 32 --colors 16
-```
+   ```sh
+   pip install git+https://github.com/hfsansotero/git-tracker
+   ```
 
-This creates `baby`, `young` and `adult` at 16, 24 and 32 px, each with a generic
-two-frame `idle`. Touch up or replace any frame by hand afterwards.
+2. **Make the frames.** Pick whichever suits you:
+   - **Draw them** in a pixel-art editor (Aseprite, LibreSprite, Piskel…) and
+     export each frame as its own PNG with a transparent background.
+   - **Start from an image** (a drawing, a photo of your pet, an AI image). Use
+     a PNG with a transparent background, or with a plain background that touches
+     the corners (it is removed automatically):
+
+     ```sh
+     git-tracker pixelize photo.png animals/mine --sizes 16 24 32 --colors 16
+     ```
+
+     This creates `baby`, `young` and `adult` at 16, 24 and 32 px, each with a
+     generic two-frame `idle`. Touch up or replace any frame by hand afterwards.
+   - **Several poses in one image** (for example, an AI-generated sheet): see
+     [sources/fox/build.py](sources/fox/build.py). It cuts the sheet, removes the
+     background and gives every pose the same scale and palette.
+
+3. **Put them in your profile repository** following the
+   [animal format](#animal-format), for example:
+
+   ```text
+   animals/mine/adult/idle/01.png
+   animals/mine/adult/idle/02.png
+   animals/mine/adult/sleep/01.png
+   ```
+
+   Start small: `adult/idle/01.png` alone already works. Each animation you add
+   shows on the days its rule in [How your activity shows](#how-your-activity-shows)
+   matches; the missing ones fall back to `idle`.
+
+4. **Preview it:**
+
+   ```sh
+   git-tracker preview animals/mine
+   ```
+
+   It writes one GIF per stage and animation to `out/mine/`, tells you which
+   ones are borrowed from another folder, and lists the sprite's colors.
+
+5. **Choose what takes your language colors.** Copy colors from that list into
+   `recolor` in `animals/mine/animal.json`, together with the speed and size:
+
+   ```json
+   {
+     "fps": {"idle": 2, "active": 6, "sleep": 1, "eat": 3},
+     "scale": 3,
+     "recolor": [["#e26730", "#dd602d", "#c04b2b"]]
+   }
+   ```
+
+   Run `preview` again: those colors now show `recolor group 1`.
+
+6. **Use it:** set `animal: animals/mine` in your workflow and push.
 
 ## Command line
 
 ```sh
 conda create -n git-tracker python=3.13 && conda activate git-tracker
-pip install -e .
-git-tracker preview animals/cat               # one GIF per stage and animation in out/cat/
+pip install -e .                              # from a clone of this repository
+git-tracker preview animals/cat               # one GIF per stage and animation in out/cat/, plus its colors
 export GITHUB_TOKEN=$(gh auth token)          # any token works; public data only
 git-tracker collect <login> -o snapshot.json  # last year of activity and languages
 git-tracker render snapshot.json animals/cat  # today's out/tracker.gif

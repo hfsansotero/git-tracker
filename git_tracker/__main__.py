@@ -9,7 +9,7 @@ from git_tracker import activity, sprites
 def preview(animal_dir: Path, out_dir: Path) -> None:
     config = sprites.load_config(animal_dir)
     canvas = sprites.canvas_size(animal_dir)
-    print(f"{animal_dir.name}: canvas {canvas[0]}x{canvas[1]} px, {config}")
+    print(f"{animal_dir.name}: canvas {canvas[0]}x{canvas[1]} px, fps {config['fps']}, scale {config['scale']}")
     for stage in sprites.STAGES:
         for animation in sprites.ANIMATIONS:
             used, frames = sprites.find_frames(animal_dir, stage, animation)
@@ -19,6 +19,11 @@ def preview(animal_dir: Path, out_dir: Path) -> None:
             note = "" if source == f"{stage}/{animation}" else f"  (uses {source})"
             print(f"  {stage}/{animation}: {len(frames)} frames{note}")
     print(f"GIFs in {out_dir}/")
+    grouped = {c.lower(): i for i, group in enumerate(config["recolor"]) for c in group}
+    print("Colors, most used first (copy them into \"recolor\" in animal.json):")
+    for color, count in sprites.palette(animal_dir).most_common():
+        group = grouped.get(color)
+        print(f"  {color}  {count:6} px" + (f"  recolor group {group + 1}" if group is not None else ""))
 
 
 def render(snapshot: Path, animal_dir: Path, out_dir: Path, thresholds: list[int]) -> None:
