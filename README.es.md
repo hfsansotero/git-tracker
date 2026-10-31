@@ -8,9 +8,9 @@ Inspirado en [git-koi](https://github.com/yalongwastaken/git-koi).
 
 ## Cómo se refleja tu actividad
 
-| Qué           | Sale de                                             |
+| Qué           | Sale de (por defecto)                               |
 | ------------- | --------------------------------------------------- |
-| **Etapa**     | Contribuciones del último año: `baby` → `young` → `adult` (umbrales por defecto 50 y 300) |
+| **Etapa**     | Contribuciones del último año: `baby` → `young` → `adult` (umbrales 50 y 300) |
 | **Animación** | Lo que pasó hasta ayer (tabla de abajo)             |
 | **Colores**   | Lenguajes principales de tus repositorios públicos  |
 
@@ -21,8 +21,9 @@ Inspirado en [git-koi](https://github.com/yalongwastaken/git-koi).
 | `active`  | Últimos 7 días al menos el doble de tu media semanal (y ≥ 5) |
 | `idle`    | Cualquier otro caso                                         |
 
-El crecimiento usa el último año, no todo tu historial. Así quien tiene poca
-actividad también ve crecer a su mascota, y si lo dejas vuelve a encoger.
+El día de hoy nunca cuenta, porque aún no ha terminado. Tanto el tamaño como la
+animación pueden seguir un ritmo más lento, como tu semana o tu mes: mira
+[Ajustar el ritmo](#ajustar-el-ritmo).
 
 ## En el README de tu perfil
 
@@ -43,7 +44,9 @@ actividad también ve crecer a su mascota, y si lo dejas vuelve a encoger.
 | `animal`     | (obligatorio)              | Carpeta del animal en tu repositorio, o nombre de un animal incluido |
 | `login`      | El dueño del repositorio   | Cuenta cuya actividad se sigue                   |
 | `output-dir` | `tracker`                  | Carpeta donde se escribe `tracker.gif`           |
-| `thresholds` | `50 300`                   | Contribuciones en el último año para pasar a young y a adult |
+| `growth`     | `year`                     | Actividad que decide el tamaño: `week`, `month` o `year` ([Ajustar el ritmo](#ajustar-el-ritmo)) |
+| `mood`       | `day`                      | Actividad que decide la animación: `day`, `week` o `month` |
+| `thresholds` | Depende de `growth`        | Contribuciones para pasar a young y a adult, como `5 25` |
 | `token`      | El token del workflow      | Token para leer datos públicos                   |
 
 GitHub pausa los workflows programados tras 60 días sin actividad en el
@@ -60,6 +63,78 @@ repositorio. Si pasa, vuelve a activarlo desde la pestaña Actions.
   `uses: hfsansotero/git-tracker@08c41ede109fc87551e004cc1921880de5d5df4f`.
 - **Tus animales:** una carpeta de animal en tu propio repositorio es solo tuya;
   los cambios de aquí nunca la tocan.
+
+## Ajustar el ritmo
+
+Dos líneas en tu workflow, junto a `animal:`, eligen qué actividad sigue tu
+mascota. Si no las pones, se usan los valores por defecto.
+
+```yaml
+      - uses: hfsansotero/git-tracker@main
+        with:
+          animal: fox
+          growth: month   # tamaño: tus últimos 30 días
+          mood: week      # animación: tu última semana terminada
+```
+
+**`growth`, el tamaño.** Cuenta tus contribuciones en una ventana móvil y las
+compara con dos umbrales: por debajo del primero, `baby`; desde el primero,
+`young`; desde el segundo, `adult`. La ventana avanza cada día, así que tu mascota
+crece y encoge de forma suave.
+
+| `growth`              | Cuenta              | Umbrales por defecto (young, adult) | Cómo se siente                      |
+| --------------------- | ------------------- | ----------------------------------- | ----------------------------------- |
+| `week`                | Últimos 7 días      | `2 8`                               | Reacciona rápido, cambia a menudo   |
+| `month`               | Últimos 30 días     | `5 25`                              | Crece a lo largo del mes; ideal con actividad ligera pero constante |
+| `year` (por defecto)  | Últimos 365 días    | `50 300`                            | Muy estable, cambia despacio        |
+
+Para poner tus propios umbrales, añade `thresholds: "<young> <adult>"`. Por
+ejemplo, con `growth: month`, `thresholds: "10 60"` hace que cueste más crecer.
+
+**`mood`, la animación.** Mira un periodo y lo compara con tu propia media, así
+que tanto una cuenta tranquila como una muy activa ven todas las animaciones.
+
+| `mood`               | Mira                                         | El GIF cambia     |
+| -------------------- | -------------------------------------------- | ----------------- |
+| `day` (por defecto)  | Ayer y los días anteriores                   | Cada día          |
+| `week`               | Tu última semana terminada (lunes a domingo) | Los lunes         |
+| `month`              | Tu último mes natural terminado              | El día 1          |
+
+Con `week` o `month`, gana la primera regla que se cumpla:
+
+| Animación | Cuándo                                                        |
+| --------- | ------------------------------------------------------------- |
+| `sleep`   | Esa semana o ese mes no tuvo contribuciones                   |
+| `eat`     | Has vuelto: ese periodo tuvo contribuciones y el anterior no  |
+| `active`  | Al menos el doble de tu semana o mes medio (y ≥ 5 por semana, ≥ 10 por mes) |
+| `idle`    | Cualquier otro caso                                           |
+
+Algunas combinaciones para copiar:
+
+```yaml
+# Poca actividad: verlo crecer a lo largo del mes, un estado de ánimo por semana
+          growth: month
+          mood: week
+
+# Mucha actividad: cuesta llegar a adulto, la animación sigue cada día
+          growth: month
+          thresholds: "20 80"
+          mood: day
+
+# Tranquilo: solo cambia una vez al mes
+          growth: year
+          mood: month
+```
+
+Para probar una configuración antes de cambiar tu workflow, ejecuta lo mismo en
+local:
+
+```sh
+git-tracker collect <tú> -o snapshot.json
+git-tracker render snapshot.json animals/fox --growth month --mood week
+```
+
+Muestra la etapa, la animación y los números que hay detrás.
 
 ## Elegir tu animal
 
@@ -96,6 +171,41 @@ Para mostrar varios animales, añade un paso por animal, cada uno con su propio
 El paso del commit (`git add tracker`) ya recoge todas las carpetas dentro de
 `tracker/`. El CI de este repositorio dibuja todos los animales incluidos solo
 para probarlos; eso nunca llega al perfil de nadie.
+
+## Animales privados
+
+Tu repositorio de perfil tiene que ser público, así que cualquiera puede
+descargar lo que haya dentro. Si quieres un animal que solo puedas usar tú
+(sprites comprados, o uno que prefieres guardarte), deja sus frames en un
+repositorio **privado** y deja que el workflow los descargue solo para dibujar.
+El GIF de tu perfil es público, como cualquier imagen que pongas ahí, pero los
+frames nunca lo son.
+
+1. Crea un repositorio privado, como `<tú>/my-sprites`, con tu animal dentro en el
+   [formato de un animal](#formato-de-un-animal), como `bat/adult/idle/01.png`.
+2. Crea un [fine-grained token](https://github.com/settings/personal-access-tokens/new)
+   con acceso **solo a ese repositorio** y el permiso **Contents: Read-only**.
+3. En tu repositorio de perfil, abre **Settings → Secrets and variables → Actions →
+   New repository secret**, llámalo `SPRITES_TOKEN` y pega el token.
+4. En tu workflow, añade un paso que lo descargue antes de git-tracker y apunta
+   `animal` ahí:
+
+   ```yaml
+       steps:
+         - uses: actions/checkout@v4
+         - uses: actions/checkout@v4
+           with:
+             repository: <tú>/my-sprites
+             token: ${{ secrets.SPRITES_TOKEN }}
+             path: private
+         - uses: hfsansotero/git-tracker@main
+           with:
+             animal: private/bat
+   ```
+
+El paso del commit solo añade `tracker/`, así que los frames privados nunca se
+suben a tu perfil. Si los sprites son comprados, comprueba que su licencia permite
+mostrarlos en una web.
 
 ## Formato de un animal
 

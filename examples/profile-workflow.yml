@@ -20,6 +20,8 @@ jobs:
       - uses: hfsansotero/git-tracker@main
         with:
           animal: fox # a built-in animal (fox) or an animal folder in this repository
+          # growth: year  # size from your last week, month or year (README: Tuning the pace)
+          # mood: day     # animation from yesterday, your last week or your last month
       - name: Commit the GIF if it changed
         run: |
           git add tracker

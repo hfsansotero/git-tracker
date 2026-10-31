@@ -14,9 +14,15 @@ inputs:
   output-dir:
     description: Folder that receives tracker.gif.
     default: tracker
+  growth:
+    description: Activity that decides the size, week, month, or year (last 7, 30, or 365 days).
+    default: year
+  mood:
+    description: Activity that decides the animation, day (yesterday), week (last finished week), or month (last finished month).
+    default: day
   thresholds:
-    description: Contributions in the last year to become young and adult, separated by a space.
-    default: "50 300"
+    description: Contributions in the growth window to become young and adult, separated by a space. Empty uses the defaults for growth.
+    default: ""
   token:
     description: Token for reading public data; the built-in token is enough.
     default: ${{ github.token }}
@@ -37,10 +43,13 @@ runs:
         TRACKER_LOGIN: ${{ inputs.login }}
         TRACKER_ANIMAL: ${{ inputs.animal }}
         TRACKER_OUTPUT_DIR: ${{ inputs.output-dir }}
+        TRACKER_GROWTH: ${{ inputs.growth }}
+        TRACKER_MOOD: ${{ inputs.mood }}
         TRACKER_THRESHOLDS: ${{ inputs.thresholds }}
       run: |
         animal="$TRACKER_ANIMAL"
         [ -d "$animal" ] || animal="$GITHUB_ACTION_PATH/animals/$TRACKER_ANIMAL"
         [ -d "$animal" ] || { echo "animal '$TRACKER_ANIMAL' not found in the repository or among the built-in animals" >&2; exit 1; }
         git-tracker collect "$TRACKER_LOGIN" -o "$RUNNER_TEMP/snapshot.json"
-        git-tracker render "$RUNNER_TEMP/snapshot.json" "$animal" -o "$TRACKER_OUTPUT_DIR" --thresholds $TRACKER_THRESHOLDS
+        git-tracker render "$RUNNER_TEMP/snapshot.json" "$animal" -o "$TRACKER_OUTPUT_DIR" \
+          --growth "$TRACKER_GROWTH" --mood "$TRACKER_MOOD" ${TRACKER_THRESHOLDS:+--thresholds $TRACKER_THRESHOLDS}

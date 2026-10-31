@@ -26,9 +26,10 @@ def preview(animal_dir: Path, out_dir: Path) -> None:
         print(f"  {color}  {count:6} px" + (f"  recolor group {group + 1}" if group is not None else ""))
 
 
-def render(snapshot: Path, animal_dir: Path, out_dir: Path, thresholds: list[int]) -> None:
+def render(snapshot: Path, animal_dir: Path, out_dir: Path, growth: str, mood: str,
+           thresholds: list[int] | None) -> None:
     summary = activity.summarize(json.loads(snapshot.read_text()),
-                                 datetime.now(timezone.utc).date(), thresholds)
+                                 datetime.now(timezone.utc).date(), growth, mood, thresholds)
     print(json.dumps(summary, indent=2))
     config = sprites.load_config(animal_dir)
     _, frames = sprites.find_frames(animal_dir, summary["stage"], summary["animation"])
@@ -60,8 +61,13 @@ def main() -> None:
     p.add_argument("snapshot", type=Path)
     p.add_argument("animal_dir", type=Path)
     p.add_argument("-o", "--output-dir", type=Path, default=Path("out"))
-    p.add_argument("--thresholds", type=int, nargs=2, default=[50, 300], metavar=("YOUNG", "ADULT"),
-                   help="contributions in the last year to reach each stage")
+    p.add_argument("--growth", choices=list(activity.GROWTH_DAYS), default="year",
+                   help="contributions of the last 7, 30 or 365 days decide the size (default: year)")
+    p.add_argument("--mood", choices=["day", "week", "month"], default="day",
+                   help="yesterday, the last finished week or the last finished month decides the animation (default: day)")
+    p.add_argument("--thresholds", type=int, nargs=2, metavar=("YOUNG", "ADULT"),
+                   help="contributions in the growth window to reach each stage "
+                        "(default: week 2 8, month 5 25, year 50 300)")
 
     args = parser.parse_args()
     if args.command == "preview":
@@ -73,7 +79,7 @@ def main() -> None:
         args.output.write_text(json.dumps(activity.collect(args.login)))
         print(f"Wrote {args.output}")
     else:
-        render(args.snapshot, args.animal_dir, args.output_dir, args.thresholds)
+        render(args.snapshot, args.animal_dir, args.output_dir, args.growth, args.mood, args.thresholds)
 
 
 if __name__ == "__main__":

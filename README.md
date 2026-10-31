@@ -8,9 +8,9 @@ your activity. Pick an animal or make your own from an image. Inspired by
 
 ## How your activity shows
 
-| What          | Comes from                                          |
+| What          | Comes from (by default)                             |
 | ------------- | --------------------------------------------------- |
-| **Stage**     | Contributions in the last year: `baby` → `young` → `adult` (default thresholds 50 and 300) |
+| **Stage**     | Contributions in the last year: `baby` → `young` → `adult` (thresholds 50 and 300) |
 | **Animation** | What happened up to yesterday (table below)         |
 | **Colors**    | Main languages of your public repositories          |
 
@@ -21,8 +21,9 @@ your activity. Pick an animal or make your own from an image. Inspired by
 | `active`  | Last 7 days at least twice your weekly average (and ≥ 5)   |
 | `idle`    | Anything else                                              |
 
-Growth uses the last year, not your whole history, so people with little activity
-still see their pet grow, and it shrinks back if you stop.
+Today never counts, because it has not ended yet. Both the size and the animation
+can follow a slower pace, such as your week or your month: see
+[Tuning the pace](#tuning-the-pace).
 
 ## On your profile README
 
@@ -43,7 +44,9 @@ still see their pet grow, and it shrinks back if you stop.
 | `animal`     | (required)           | Animal folder in your repository, or a built-in animal name |
 | `login`      | The repository owner | Account whose activity to track                   |
 | `output-dir` | `tracker`            | Folder that receives `tracker.gif`                |
-| `thresholds` | `50 300`             | Contributions in the last year to become young and adult |
+| `growth`     | `year`               | Activity that decides the size: `week`, `month` or `year` ([Tuning the pace](#tuning-the-pace)) |
+| `mood`       | `day`                | Activity that decides the animation: `day`, `week` or `month` |
+| `thresholds` | Depends on `growth`  | Contributions to become young and adult, such as `5 25` |
 | `token`      | The built-in token   | Token for reading public data                     |
 
 GitHub pauses scheduled workflows after 60 days without activity in the
@@ -60,6 +63,77 @@ repository. Re-enable it from the Actions tab if that happens.
   `uses: hfsansotero/git-tracker@08c41ede109fc87551e004cc1921880de5d5df4f`.
 - **Your animals:** an animal folder in your own repository is yours alone; changes
   here never touch it.
+
+## Tuning the pace
+
+Two lines in your workflow, next to `animal:`, choose which activity your pet
+follows. Leave them out to keep the defaults.
+
+```yaml
+      - uses: hfsansotero/git-tracker@main
+        with:
+          animal: fox
+          growth: month   # size: your last 30 days
+          mood: week      # animation: your last finished week
+```
+
+**`growth`, the size.** It counts your contributions in a moving window and
+compares them with two thresholds: below the first, `baby`; from the first,
+`young`; from the second, `adult`. The window moves every day, so your pet grows
+and shrinks smoothly.
+
+| `growth`         | Counts            | Default thresholds (young, adult) | Feels like                            |
+| ---------------- | ----------------- | --------------------------------- | ------------------------------------- |
+| `week`           | Last 7 days       | `2 8`                             | Reacts fast, changes size often       |
+| `month`          | Last 30 days      | `5 25`                            | Grows over a month; good for steady, light activity |
+| `year` (default) | Last 365 days     | `50 300`                          | Very stable, changes slowly           |
+
+To set your own thresholds, add `thresholds: "<young> <adult>"`. For example,
+with `growth: month`, `thresholds: "10 60"` makes it harder to grow.
+
+**`mood`, the animation.** It looks at one period and compares it with your own
+average, so a quiet account and a busy one both see every animation.
+
+| `mood`          | Looks at                                  | The GIF changes      |
+| --------------- | ----------------------------------------- | -------------------- |
+| `day` (default) | Yesterday and the days before             | Every day            |
+| `week`          | Your last finished week (Monday–Sunday)   | On Mondays           |
+| `month`         | Your last finished calendar month         | On the 1st           |
+
+With `week` or `month`, first match wins:
+
+| Animation | When                                                          |
+| --------- | ------------------------------------------------------------- |
+| `sleep`   | That week or month had no contributions                       |
+| `eat`     | You came back: that one had contributions, the one before had none |
+| `active`  | At least twice your average week or month (and ≥ 5 a week, ≥ 10 a month) |
+| `idle`    | Anything else                                                 |
+
+Some combinations to copy:
+
+```yaml
+# Little activity: watch it grow over the month, one mood per week
+          growth: month
+          mood: week
+
+# Very active: an adult needs a lot, the animation follows each day
+          growth: month
+          thresholds: "20 80"
+          mood: day
+
+# Calm: changes only once a month
+          growth: year
+          mood: month
+```
+
+To try a setting before changing your workflow, run the same thing locally:
+
+```sh
+git-tracker collect <you> -o snapshot.json
+git-tracker render snapshot.json animals/fox --growth month --mood week
+```
+
+It prints the stage, the animation and the numbers behind them.
 
 ## Choosing your animal
 
@@ -96,6 +170,40 @@ To show several animals, add one step per animal, each with its own
 The commit step (`git add tracker`) already picks up every folder under `tracker/`.
 The CI of this repository renders all built-in animals only to test them; that
 never reaches anyone's profile.
+
+## Private animals
+
+Your profile repository has to be public, so anything inside it can be
+downloaded. If you want an animal only you can use (bought sprites, or one you
+just want to keep), keep its frames in a **private** repository and let the
+workflow fetch them only to draw. The GIF on your profile is public, like any
+image there, but the frames never are.
+
+1. Create a private repository, such as `<you>/my-sprites`, with your animal
+   inside it in the [animal format](#animal-format), such as `bat/adult/idle/01.png`.
+2. Create a [fine-grained token](https://github.com/settings/personal-access-tokens/new)
+   with access to **only that repository** and the permission **Contents: Read-only**.
+3. In your profile repository, open **Settings → Secrets and variables → Actions →
+   New repository secret**, name it `SPRITES_TOKEN` and paste the token.
+4. In your workflow, add a step that fetches it before git-tracker, and point
+   `animal` there:
+
+   ```yaml
+       steps:
+         - uses: actions/checkout@v4
+         - uses: actions/checkout@v4
+           with:
+             repository: <you>/my-sprites
+             token: ${{ secrets.SPRITES_TOKEN }}
+             path: private
+         - uses: hfsansotero/git-tracker@main
+           with:
+             animal: private/bat
+   ```
+
+The commit step only adds `tracker/`, so the private frames are never committed
+to your profile. If you bought the sprites, check that their license lets you
+show them on a website.
 
 ## Animal format
 
