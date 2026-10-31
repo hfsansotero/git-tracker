@@ -19,15 +19,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          python - <<'PY'
-          from PIL import Image, ImageDraw
-          im = Image.new("RGBA", (64, 64)); ImageDraw.Draw(im).ellipse((4, 16, 60, 60), fill="#808080"); im.save("blob.png")
-          PY
-          git-tracker pixelize blob.png out/blob
-          echo '{"recolor": [["#808080"]]}' > out/blob/animal.json
           git-tracker collect "${{ github.repository_owner }}" -o snapshot.json
-          git-tracker render snapshot.json out/blob -o out
-          git-tracker preview out/blob
+          for animal in animals/*/; do
+            name=$(basename "$animal")
+            git-tracker render snapshot.json "$animal" -o "out/$name"
+            git-tracker preview "$animal"
+          done
       - uses: actions/upload-artifact@v4
         with:
           name: gifs
