@@ -6,15 +6,21 @@ Una mascota en pixel art para tu perfil de GitHub que crece, cambia de color y s
 mueve según tu actividad. Elige un animal o crea el tuyo a partir de una imagen.
 Inspirado en [git-koi](https://github.com/yalongwastaken/git-koi).
 
-<p align="center"><img src="examples/fox.gif" alt="El zorro dormido, enroscado, en lila Kotlin, con la cola de CSS y la crin de TypeScript" /></p>
+<table align="center">
+  <tr>
+    <td align="center"><img src="examples/fox-sleep.gif" alt="Un zorro adulto dormido, enroscado, en lila Kotlin, con la cola de CSS y la crin de TypeScript" /></td>
+    <td align="center"><img src="examples/fox-eat.gif" alt="Un zorro joven comiendo, en ámbar Java, con la cola de Rust y la crin de JavaScript" /></td>
+  </tr>
+</table>
 
-Así se vería el zorro en este perfil ficticio, con la configuración por defecto:
+El mismo zorro en dos perfiles ficticios, con la configuración por defecto:
 
-| Actividad ficticia | Resultado |
-| ------------------ | --------- |
-| 448 contribuciones en el último año (más de 300) | Etapa `adult` |
-| Ninguna contribución en los últimos 16 días, unas vacaciones (14 o más) | Animación `sleep`: enroscado, respirando |
-| Repositorios públicos: 9 en Kotlin, 5 en CSS y 3 en TypeScript | Pelaje Kotlin, cola CSS, crin TypeScript |
+|                            | Dormido (izquierda)                                 | Comiendo (derecha)                               |
+| -------------------------- | --------------------------------------------------- | ------------------------------------------------ |
+| **Último año**             | 448 contribuciones (más de 300): `adult`            | 155 contribuciones (entre 50 y 300): `young`, más pequeño |
+| **Últimamente**            | Ninguna en los últimos 16 días, unas vacaciones (14 o más): `sleep`, enroscado y respirando | 9 días sin contribuir y ayer fue el primer día con contribuciones de su semana: `eat` |
+| **Repositorios públicos**  | 9 en Kotlin, 5 en CSS y 3 en TypeScript             | 9 en Java, 5 en Rust y 3 en JavaScript           |
+| **Colores**                | Pelaje Kotlin, cola CSS, crin TypeScript            | Pelaje Java, cola Rust, crin JavaScript          |
 
 En tu perfil, la mascota sigue tu propia actividad y tus lenguajes.
 

@@ -6,15 +6,21 @@ A pixel-art pet for your GitHub profile that grows, changes color, and moves wit
 your activity. Pick an animal or make your own from an image. Inspired by
 [git-koi](https://github.com/yalongwastaken/git-koi).
 
-<p align="center"><img src="examples/fox.gif" alt="The fox asleep, curled up, in Kotlin lilac, with a CSS tail and a TypeScript mane" /></p>
+<table align="center">
+  <tr>
+    <td align="center"><img src="examples/fox-sleep.gif" alt="An adult fox asleep, curled up, in Kotlin lilac, with a CSS tail and a TypeScript mane" /></td>
+    <td align="center"><img src="examples/fox-eat.gif" alt="A young fox eating, in Java amber, with a Rust tail and a JavaScript mane" /></td>
+  </tr>
+</table>
 
-What the fox would look like on this fictional profile, with the default settings:
+The same fox on two fictional profiles, with the default settings:
 
-| Fictional activity | Result |
-| ------------------ | ------ |
-| 448 contributions in the last year (more than 300) | Stage `adult` |
-| No contributions in the last 16 days, a holiday (14 or more) | Animation `sleep`: curled up, breathing |
-| Public repositories: 9 in Kotlin, 5 in CSS, 3 in TypeScript | Kotlin coat, CSS tail, TypeScript mane |
+|                            | Asleep (left)                                      | Eating (right)                                   |
+| -------------------------- | -------------------------------------------------- | ------------------------------------------------ |
+| **Last year**              | 448 contributions (more than 300): `adult`         | 155 contributions (between 50 and 300): `young`, smaller |
+| **Lately**                 | None in the last 16 days, a holiday (14 or more): `sleep`, curled up and breathing | 9 quiet days, then yesterday was the first day with contributions of its week: `eat` |
+| **Public repositories**    | 9 in Kotlin, 5 in CSS, 3 in TypeScript             | 9 in Java, 5 in Rust, 3 in JavaScript            |
+| **Colors**                 | Kotlin coat, CSS tail, TypeScript mane             | Java coat, Rust tail, JavaScript mane            |
 
 On your profile, the pet follows your own activity and languages.
 
