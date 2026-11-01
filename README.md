@@ -251,7 +251,7 @@ animals/cat/
 
 | Name  | Made with |
 | ----- | --------- |
-| `fox` | Poses generated with Higgsfield, processed by [sources/fox/build.py](sources/fox/build.py) |
+| `fox` | Poses generated with Higgsfield, processed by [sources/fox/build.py](sources/fox/build.py). Three language colors: the coat, the tail and the cream mane of the chest and cheeks; the tail tip stays white |
 
 ## Your own animal, step by step
 

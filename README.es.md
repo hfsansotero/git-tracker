@@ -254,7 +254,7 @@ animals/gato/
 
 | Nombre | Cómo se hizo |
 | ------ | ------------ |
-| `fox`  | Poses generadas con Higgsfield y procesadas con [sources/fox/build.py](sources/fox/build.py) |
+| `fox`  | Poses generadas con Higgsfield y procesadas con [sources/fox/build.py](sources/fox/build.py). Tres colores de lenguaje: el pelaje, la cola y la crin crema del pecho y las mejillas; la punta de la cola sigue blanca |
 
 ## Tu propio animal, paso a paso
 

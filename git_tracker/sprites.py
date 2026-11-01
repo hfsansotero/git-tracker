@@ -133,6 +133,23 @@ def pixelize_set(images: list[Image.Image], size: int, colors: int = 16) -> list
     return out
 
 
+def split_zone(frame: Image.Image, polygon, test, step: int = 1) -> set:
+    """Para dar a una parte del sprite su propio grupo de `recolor` cuando comparte colores
+    con otra: los píxeles dentro de `polygon` (puntos en fracciones del frame, 0-1) cuyo
+    color cumple `test(rgb)` pasan a un gemelo casi idéntico (azul XOR `step`).
+    Modifica el frame y devuelve los colores gemelos usados."""
+    mask = Image.new("L", frame.size)
+    ImageDraw.Draw(mask).polygon([(x * frame.width, y * frame.height) for x, y in polygon], fill=255)
+    px, inside, twins = frame.load(), mask.load(), set()
+    for y in range(frame.height):
+        for x in range(frame.width):
+            r, g, b, a = px[x, y]
+            if a and inside[x, y] and test((r, g, b)):
+                px[x, y] = (r, g, b ^ step, a)
+                twins.add((r, g, b ^ step))
+    return twins
+
+
 def breathe(frame: Image.Image, cut: float = 0.6) -> Image.Image:
     """Baja 1 px todo lo que está por encima de `cut` (fracción de la altura) y deja las
     patas quietas: respiración sutil de pixel art."""

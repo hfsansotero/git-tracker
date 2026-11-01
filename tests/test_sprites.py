@@ -60,4 +60,9 @@ with tempfile.TemporaryDirectory() as tmp:
     assert fa.size == (20, 20) and fb.size == (10, 10) and fa.getpixel((0, 0)) == fb.getpixel((0, 0))
     assert sprites.breathe(fa, 0.5).getpixel((0, 0))[3] == 0  # la parte de arriba baja 1 px
 
+    # split_zone: solo cambia lo que está dentro del polígono y cumple el test
+    z = Image.new("RGBA", (10, 10), (200, 90, 40, 255))
+    twins = sprites.split_zone(z, [(0, 0), (0.5, 0), (0.5, 1), (0, 1)], lambda c: c[0] > 100)
+    assert twins == {(200, 90, 41)} and z.getpixel((1, 5))[:3] == (200, 90, 41) and z.getpixel((8, 5))[:3] == (200, 90, 40)
+
 print("ok")
