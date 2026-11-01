@@ -6,15 +6,15 @@ Una mascota en pixel art para tu perfil de GitHub que crece, cambia de color y s
 mueve según tu actividad. Elige un animal o crea el tuyo a partir de una imagen.
 Inspirado en [git-koi](https://github.com/yalongwastaken/git-koi).
 
-<p align="center"><img src="examples/fox.gif" alt="El zorro corriendo en azul TypeScript, con la cola de Rust y la crin de JavaScript" /></p>
+<p align="center"><img src="examples/fox.gif" alt="El zorro dormido, enroscado, en lila Kotlin, con la cola de CSS y la crin de TypeScript" /></p>
 
 Así se vería el zorro en este perfil ficticio, con la configuración por defecto:
 
 | Actividad ficticia | Resultado |
 | ------------------ | --------- |
-| 472 contribuciones en el último año (más de 300) | Etapa `adult` |
-| 40 contribuciones en los últimos 7 días, más del doble de su media semanal (unas 9) | Animación `active`: corre |
-| Repositorios públicos: 9 en TypeScript, 5 en Rust y 3 en JavaScript | Pelaje TypeScript, cola Rust, crin JavaScript |
+| 448 contribuciones en el último año (más de 300) | Etapa `adult` |
+| Ninguna contribución en los últimos 16 días, unas vacaciones (14 o más) | Animación `sleep`: enroscado, respirando |
+| Repositorios públicos: 9 en Kotlin, 5 en CSS y 3 en TypeScript | Pelaje Kotlin, cola CSS, crin TypeScript |
 
 En tu perfil, la mascota sigue tu propia actividad y tus lenguajes.
 
