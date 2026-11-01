@@ -241,9 +241,11 @@ animals/cat/
     `{"idle": 1.5, "active": 4}` (missing ones use 6).
   - `scale`: whole-number enlargement of the GIF.
   - `recolor`: groups of exact sprite colors that take a language's color. The
-    first group takes your top language, the second group your second one:
-    `[["#c86420", "#e07020"], ["#2040a0"]]`. Each pixel keeps its brightness,
-    so shading survives.
+    first group takes your top language, the second your second one, and so on:
+    `[["#c86420", "#e07020"], ["#2040a0"], ["#5a5a5a"]]`. Each pixel keeps its
+    brightness, so shading survives. Use **three groups** (main body, trim,
+    details) so the animal shows your top three languages; with fewer languages,
+    the extra groups keep their own colors.
 
 ## Built-in animals
 
@@ -272,6 +274,10 @@ animals/cat/
 
      This creates `baby`, `young` and `adult` at 16, 24 and 32 px, each with a
      generic two-frame `idle`. Touch up or replace any frame by hand afterwards.
+
+     If you generate the image with AI, ask for **three clearly different color
+     areas** (for example: the body in one color, the trim in another, the small
+     details in a third). Each area then becomes one `recolor` group in step 5.
    - **Several poses in one image** (for example, an AI-generated sheet): see
      [sources/fox/build.py](sources/fox/build.py). It cuts the sheet, removes the
      background and gives every pose the same scale and palette.
@@ -305,11 +311,12 @@ animals/cat/
    {
      "fps": {"idle": 2, "active": 6, "sleep": 1, "eat": 3},
      "scale": 3,
-     "recolor": [["#e26730", "#dd602d", "#c04b2b"]]
+     "recolor": [["#e26730", "#dd602d", "#c04b2b"], ["#f4e3c9", "#e8d2b0"], ["#3a2a22"]]
    }
    ```
 
-   Run `preview` again: those colors now show `recolor group 1`.
+   One group per color area: body, trim and details. Run `preview` again: each
+   color now shows its `recolor group`.
 
 6. **Use it:** set `animal: animals/mine` in your workflow and push.
 

@@ -243,9 +243,12 @@ animals/gato/
     `{"idle": 1.5, "active": 4}` (las que falten usan 6).
   - `scale`: aumento entero del GIF.
   - `recolor`: grupos de colores exactos del sprite que toman el color de un
-    lenguaje. El primer grupo toma tu lenguaje principal y el segundo grupo el
-    siguiente: `[["#c86420", "#e07020"], ["#2040a0"]]`. Cada píxel conserva su
-    brillo, así que el sombreado se mantiene.
+    lenguaje. El primer grupo toma tu lenguaje principal, el segundo el siguiente,
+    y así sucesivamente: `[["#c86420", "#e07020"], ["#2040a0"], ["#5a5a5a"]]`.
+    Cada píxel conserva su brillo, así que el sombreado se mantiene. Usa **tres
+    grupos** (cuerpo, adornos y detalles) para que el animal muestre tus tres
+    lenguajes principales; si tienes menos lenguajes, los grupos que sobran
+    conservan sus colores.
 
 ## Animales incluidos
 
@@ -275,6 +278,10 @@ animals/gato/
      Crea `baby`, `young` y `adult` a 16, 24 y 32 px, cada una con un `idle`
      genérico de dos frames. Después puedes retocar o sustituir cualquier frame a
      mano.
+
+     Si generas la imagen con IA, pide **tres zonas de color bien distintas**
+     (por ejemplo: el cuerpo de un color, los adornos de otro y los detalles
+     pequeños de un tercero). Cada zona será un grupo de `recolor` en el paso 5.
    - **Varias poses en una imagen** (por ejemplo, una hoja generada con IA): mira
      [sources/fox/build.py](sources/fox/build.py). Recorta la hoja, quita el fondo
      y da a todas las poses la misma escala y paleta.
@@ -310,11 +317,12 @@ animals/gato/
    {
      "fps": {"idle": 2, "active": 6, "sleep": 1, "eat": 3},
      "scale": 3,
-     "recolor": [["#e26730", "#dd602d", "#c04b2b"]]
+     "recolor": [["#e26730", "#dd602d", "#c04b2b"], ["#f4e3c9", "#e8d2b0"], ["#3a2a22"]]
    }
    ```
 
-   Vuelve a ejecutar `preview`: esos colores ahora indican `recolor group 1`.
+   Un grupo por zona de color: cuerpo, adornos y detalles. Vuelve a ejecutar
+   `preview`: cada color indica ahora su `recolor group`.
 
 6. **Úsalo:** pon `animal: animals/mio` en tu workflow y haz push.
 
