@@ -6,6 +6,18 @@ A pixel-art pet for your GitHub profile that grows, changes color, and moves wit
 your activity. Pick an animal or make your own from an image. Inspired by
 [git-koi](https://github.com/yalongwastaken/git-koi).
 
+<p align="center"><img src="examples/fox.gif" alt="The fox running in TypeScript blue, with a Rust tail and a JavaScript mane" /></p>
+
+What the fox would look like on this fictional profile, with the default settings:
+
+| Fictional activity | Result |
+| ------------------ | ------ |
+| 472 contributions in the last year (more than 300) | Stage `adult` |
+| 40 contributions in the last 7 days, more than twice its weekly average (about 9) | Animation `active`: it runs |
+| Public repositories: 9 in TypeScript, 5 in Rust, 3 in JavaScript | TypeScript coat, Rust tail, JavaScript mane |
+
+On your profile, the pet follows your own activity and languages.
+
 ## How your activity shows
 
 | What          | Comes from (by default)                             |
